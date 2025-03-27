@@ -25,6 +25,12 @@ let sequelize = new Sequelize(
         },
         dialectOptions: {
             useUTC: true,
+            ...(process.env.NODE_ENV !== 'local' ? {
+                ssl: {
+                    require: true,
+                    rejectUnauthorized: false
+                }
+            } : {})
         },
     }
 );
