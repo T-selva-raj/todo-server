@@ -15,11 +15,13 @@ const envFile = `.env.${process.env.NODE_ENV || 'dev'}`;
 const serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_JSON, "base64").toString("utf8"));
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: `https://${process.env.FIREBASE_PROJECTID}.firebaseio.com`,
-  storageBucket: 'test-app-d051b.appspot.com'
 });
-bucket = admin.storage().bucket();
+const { createClient } = require('@supabase/supabase-js');
 
+supabase = createClient(
+  process.env.BUCKET_URL,
+  process.env.BUCKET_KEY
+);
 
 
 dotenv.config({ path: path.resolve(__dirname, envFile) });

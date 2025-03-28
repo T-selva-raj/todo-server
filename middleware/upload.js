@@ -2,31 +2,25 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-const uploadToFirebase = async (req, res, next) => {
-    if (req.file) {
-        try {
-            const username = req.user.uid;
-            const fileName = `${username}/${Date.now()}_${req.file.originalname}`;
-            const file = bucket.file(fileName);
-            const stream = file.createWriteStream({
-                metadata: { contentType: req.file.mimetype },
-            });
-            stream.on("error", (err) => {
-                console.error("Upload Error:", err);
-                return res.status(500).json({ message: "Upload failed", error: err.message });
-            });
-            stream.on("finish", async () => {
-                await file.makePublic();
-                req.file.firebaseUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
-                next();
-            });
-            stream.end(req.file.buffer);
-        } catch (error) {
+const uploadToSupabase = async (req, res, next) => {
+    if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+    }
+    try {
+        const username = req.user ? req.user.uid : "guest";
+        const fileName = `${username}/${Date.now()}_${req.file.originalname}`;
+        const { data, error } = await supabase.storage
+            .from(process.env.BUCKET_NAME)
+            .upload(fileName, req.file.buffer, { contentType: req.file.mimetype });
+        if (error) {
+            console.error("Upload Error:", error);
             return res.status(500).json({ message: "Upload failed", error: error.message });
         }
+        req.file.supabaseUrl = supabase.storage.from(process.env.BUCKET_NAME).getPublicUrl(fileName).data.publicUrl;
+        next();
+    } catch (error) {
+        return res.status(500).json({ message: "Upload failed", error: error.message });
     }
-    else next();
-
 };
 
-module.exports = { upload, uploadToFirebase };
+module.exports = { upload, uploadToSupabase };
