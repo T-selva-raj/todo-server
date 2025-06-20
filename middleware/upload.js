@@ -4,7 +4,7 @@ const upload = multer({ storage: storage });
 
 const uploadToSupabase = async (req, res, next) => {
     if (!req.file) {
-        return res.status(400).json({ message: "No file uploaded" });
+        return;
     }
     try {
         const username = req.user ? req.user.uid : "guest";
