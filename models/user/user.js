@@ -28,7 +28,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         taskCompleted: {
             type: Sequelize.NUMERIC,
-            default: 0
+            defaultValue: 0
         },
         createdAt: {
             type: Sequelize.DATE,
