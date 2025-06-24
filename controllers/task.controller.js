@@ -65,9 +65,9 @@ const getAllTasks = async (req, res) => {
                 condition['status'] = { [Op.in]: ['open', 'progress', 'done'] }
             } else condition['status'] = req.query.status;
         }
-        const [error, deleted] = await to(taskService.getAllTasks(condition, limit, offset));
+        const [error, tasks] = await to(taskService.getAllTasks(condition, limit, offset));
         if (error) throw new Error(error.message);
-        res.status(200).json({ result: deleted, message: 'Task fetch successfully' });
+        res.status(200).json({ result: tasks, message: 'Task fetch successfully' });
     } catch (error) {
         res.status(400).json({ message: 'Task fetch failed', error: error.message });
     }

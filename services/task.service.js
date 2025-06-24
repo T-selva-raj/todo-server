@@ -10,7 +10,7 @@ const createTask = async (taskData) => {
             due: taskData?.dueDate,
             priority: taskData?.importance,
             status: taskData?.status,
-            userId: 1
+            userId: taskData?.userId
         };
         const [error, taskCreate] = await to(task.create(data));
         if (error) return TE(error.message);
@@ -74,6 +74,8 @@ module.exports.getOneTask = getOneTask;
 
 const getAllTasks = async (whereCondition, limit, offset) => {
     try {
+        console.log(whereCondition, limit, offset);
+
         const [error, taskData] = await to(task.findAndCountAll({
             where: whereCondition,
             limit: limit,
